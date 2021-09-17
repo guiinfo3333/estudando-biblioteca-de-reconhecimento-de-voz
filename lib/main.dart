@@ -18,8 +18,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key}) : super(key: key);
 
@@ -28,30 +26,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  List<String> lista = ["direita","esquerda"];
-  String estadodaaplicao= "esquerda";
+  List<String> lista = ["direita", "esquerda"];
+  String estadodaaplicao = "esquerda";
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
-  double size=50.0;
-  double x= 0;
+  double size = 50.0;
+  double x = 0;
   double y = 200;
-  var gravity=10;
+  var gravity = 10;
   var ticker;
-
-
 
   @override
   void initState() {
     super.initState();
-     ticker= Ticker((now){
-       setState(() {
-         x=x;
-         y=y;
-       });
-     });
-     ticker.start();
+    ticker = Ticker((now) {
+      setState(() {
+        x = x;
+        y = y;
+      });
+    });
+    ticker.start();
     _initSpeech();
   }
 
@@ -73,25 +68,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords.split(" ")[0];
-      switch(_lastWords){
+      switch (_lastWords) {
         case 'direita':
-          estadodaaplicao="direita";
+          estadodaaplicao = "direita";
           break;
         case 'esquerda':
-          estadodaaplicao="esquerda";
+          estadodaaplicao = "esquerda";
           break;
-        default:
-          estadodaaplicao="direita";
       }
     });
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-
     verificaEstadoAplicacao();
 
     return Scaffold(
@@ -111,21 +100,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(fontSize: 20.0),
               ),
             ),
-            Container(
-                child: Animateste()
-            ),
+            Container(child: Animateste()),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 10),
-              child: RaisedButton(onPressed:()=>{
-                setState(()=>{
-                  if(estadodaaplicao=="esquerda"){
-                    estadodaaplicao="direita"
-                  }else{
-                    estadodaaplicao="esquerda"
-                  }
-                })
-              },
-                child: Text("Mude a direção da bolinha apertando  aqui, ou fale 'esquerda' ou 'direita' no microfone "),
+              child: RaisedButton(
+                onPressed: () => {
+                  setState(() => {
+                        if (estadodaaplicao == "esquerda")
+                          {estadodaaplicao = "direita"}
+                        else
+                          {estadodaaplicao = "esquerda"}
+                      })
+                },
+                child: Text(
+                    "Mude a direção da bolinha apertando  aqui, ou fale 'esquerda' ou 'direita' no microfone "),
               ),
             ),
             Expanded(
@@ -135,8 +123,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   _speechToText.isListening
                       ? '$_lastWords'
                       : _speechEnabled
-                      ? 'Tap the microphone to start listening...'
-                      : 'Speech not available',
+                          ? 'Tap the microphone to start listening...'
+                          : 'Speech not available',
                 ),
               ),
             ),
@@ -145,41 +133,41 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed:
-        _speechToText.isNotListening ? _startListening : _stopListening,
+            _speechToText.isNotListening ? _startListening : _stopListening,
         tooltip: 'Listen',
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
     );
   }
 
-  void verificaEstadoAplicacao(){
-    switch(estadodaaplicao){
+  void verificaEstadoAplicacao() {
+    switch (estadodaaplicao) {
       case 'direita':
-        if(x < (MediaQuery.of(context).size.width-size)){
+        if (x < (MediaQuery.of(context).size.width - size)) {
           print(x);
           print(MediaQuery.of(context).size.width - size);
-          x+=gravity;
+          x += gravity;
         }
         break;
       case 'esquerda':
-        if(x > 0){
-          x-=gravity;
+        if (x > 0) {
+          x -= gravity;
         }
         break;
     }
   }
 
-
-  Widget Animateste(){
-    return  Transform.translate(offset:Offset(x,y),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(40),
-            color:Colors.red,
-          ),
-          width: size,
-          height:size,
+  Widget Animateste() {
+    return Transform.translate(
+      offset: Offset(x, y),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(40),
+          color: Colors.red,
         ),
-      );
+        width: size,
+        height: size,
+      ),
+    );
   }
 }
