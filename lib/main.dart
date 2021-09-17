@@ -29,15 +29,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  List<String> lista = ["direita","esquerda","cima","baixo"];
-  String estadodaaplicao= "baixo";
+  List<String> lista = ["direita","esquerda"];
+  String estadodaaplicao= "esquerda";
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
   double size=50.0;
   double x= 0;
-  double y = 100.0;
-  var gravity=1;
+  double y = 200;
+  var gravity=10;
   var ticker;
 
 
@@ -55,39 +55,25 @@ class _MyHomePageState extends State<MyHomePage> {
     _initSpeech();
   }
 
-  /// This has to happen only once per app
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
     setState(() {});
   }
 
-  /// Each time to start a speech recognition session
   void _startListening() async {
     await _speechToText.listen(onResult: _onSpeechResult);
     setState(() {});
   }
 
-  /// Manually stop the active speech recognition session
-  /// Note that there are also timeouts that each platform enforces
-  /// and the SpeechToText plugin supports setting timeouts on the
-  /// listen method.
   void _stopListening() async {
     await _speechToText.stop();
     setState(() {});
   }
 
-  /// This is the callback that the SpeechToText plugin calls when
-  /// the platform returns recognized words.
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords.split(" ")[0];
       switch(_lastWords){
-        case 'baixo':
-          estadodaaplicao="baixo";
-          break;
-        case 'cima':
-          estadodaaplicao="cima";
-          break;
         case 'direita':
           estadodaaplicao="direita";
           break;
@@ -95,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
           estadodaaplicao="esquerda";
           break;
         default:
-          estadodaaplicao="baixo";
+          estadodaaplicao="direita";
       }
     });
   }
@@ -105,31 +91,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    switch(estadodaaplicao){
-      case 'baixo':
-        if(y< (MediaQuery.of(context).size.height - size)){
-          y+=gravity;
-        }
-        break;
-      case 'cima':
-        if(y > size){
-          y-=gravity;
-        }
-        break;
-      case 'direita':
-        if(x < (MediaQuery.of(context).size.width-size)){
-          print(x);
-          print(MediaQuery.of(context).size.width - size);
-          x+=gravity;
-        }
-        break;
-      case 'esquerda':
-        if(x > size){
-          x-=gravity;
-        }
-        break;
-    }
 
+    verificaEstadoAplicacao();
 
     return Scaffold(
       appBar: AppBar(
@@ -144,29 +107,33 @@ class _MyHomePageState extends State<MyHomePage> {
             Container(
               padding: EdgeInsets.all(16),
               child: Text(
-                'Recognized words:',
+                'Aplicação que utiliza sua voz :',
                 style: TextStyle(fontSize: 20.0),
               ),
             ),
             Container(
                 child: Animateste()
             ),
-            RaisedButton(onPressed:()=>{
-
-            },
-              child: Text("Mude o texto apertando ak"),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              child: RaisedButton(onPressed:()=>{
+                setState(()=>{
+                  if(estadodaaplicao=="esquerda"){
+                    estadodaaplicao="direita"
+                  }else{
+                    estadodaaplicao="esquerda"
+                  }
+                })
+              },
+                child: Text("Mude a direção da bolinha apertando  aqui, ou fale 'esquerda' ou 'direita' no microfone "),
+              ),
             ),
             Expanded(
               child: Container(
                 padding: EdgeInsets.all(16),
                 child: Text(
-                  // If listening is active show the recognized words
                   _speechToText.isListening
                       ? '$_lastWords'
-                  // If listening isn't active but could be tell the user
-                  // how to start it, otherwise indicate that speech
-                  // recognition is not yet ready or not supported on
-                  // the target device
                       : _speechEnabled
                       ? 'Tap the microphone to start listening...'
                       : 'Speech not available',
@@ -178,13 +145,30 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed:
-        // If not yet listening for speech start, otherwise stop
         _speechToText.isNotListening ? _startListening : _stopListening,
         tooltip: 'Listen',
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
     );
   }
+
+  void verificaEstadoAplicacao(){
+    switch(estadodaaplicao){
+      case 'direita':
+        if(x < (MediaQuery.of(context).size.width-size)){
+          print(x);
+          print(MediaQuery.of(context).size.width - size);
+          x+=gravity;
+        }
+        break;
+      case 'esquerda':
+        if(x > 0){
+          x-=gravity;
+        }
+        break;
+    }
+  }
+
 
   Widget Animateste(){
     return  Transform.translate(offset:Offset(x,y),
